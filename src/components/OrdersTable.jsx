@@ -25,12 +25,13 @@ const OrdersTable = ({ orders }) => {
             </th>
             <th className="font-semibold">Foydalanuvchi</th>
             <th className="font-semibold">Manzil</th>
-            <th className="font-semibold">Tel raqam</th>
-            <th className="font-semibold">Holati</th>
+            <th className="w-48 font-semibold">Tel raqam</th>
+            <th className="w-44 font-semibold">Holati</th>
             <th className="font-semibold">Mahsulot ID</th>
             <th className="font-semibold">Mahsulot narxi</th>
-            <th className="font-semibold">Sana</th>
+            <th className="w-40 font-semibold">Sana</th>
             <th className="w-28 font-semibold">Darajasi</th>
+            <th className="w-28 font-semibold">Harakat</th>
           </tr>
         </thead>
 
@@ -39,8 +40,8 @@ const OrdersTable = ({ orders }) => {
           {orders.map((order, index) => (
             <OrderItem
               data={order}
-              index={index + 1}
               key={order?._id}
+              index={index + 1}
               isScrolled={isScrolled}
             />
           ))}
