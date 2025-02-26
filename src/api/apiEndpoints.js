@@ -12,6 +12,8 @@ const apiEndpoints = {
   // Orders
   getOrders: "api/orders/operator",
   createOrder: (id) => `api/orders/${id}`,
+  checkOrder: (id) => `api/orders/${id}/check`,
+  cancelOrder: (id) => `api/orders/${id}/cancel`,
   addOrderToOperator: "api/orders/sign_order_to_operator",
 
   // Products

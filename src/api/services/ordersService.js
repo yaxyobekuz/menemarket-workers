@@ -20,6 +20,22 @@ const ordersService = {
       throw err;
     }
   },
+
+  checkOrder: async (id, data) => {
+    try {
+      return await api.put(endpoints.checkOrder(id), data);
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  cancelOrder: async (id) => {
+    try {
+      return await api.put(endpoints.cancelOrder(id));
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 export default ordersService;
