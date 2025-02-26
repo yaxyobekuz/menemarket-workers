@@ -1,13 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 // Components
 import Icon from "./Icon";
-import DeleteAlertDialog from "./DeleteAlertDialog";
 
 // Images
 import eyeIcon from "@/assets/images/icons/eye.svg";
-import editIcon from "@/assets/images/icons/edit.svg";
 import starIcon from "@/assets/images/icons/mono-star-filled.svg";
 
 const ProductItem = ({ data = {}, deleteProduct }) => {
@@ -49,18 +46,6 @@ const ProductItem = ({ data = {}, deleteProduct }) => {
               className="size-[22px] xs:size-6"
             />
           </a>
-
-          {/* Edit */}
-          <Link
-            to={`/products/edit/${id}`}
-            className="btn size-9 bg-white rounded-full border xs:size-10"
-          >
-            <Icon
-              src={editIcon}
-              alt="Edit icon"
-              className="size-[22px] xs:size-6"
-            />
-          </Link>
         </div>
       </div>
 
@@ -106,22 +91,6 @@ const ProductItem = ({ data = {}, deleteProduct }) => {
               />
             </div>
           </div>
-
-          <DeleteAlertDialog
-            title="Mahsulotni o'chirish"
-            action={() => deleteProduct(id)}
-            description={
-              <>
-                <span>Siz haqiqatdan ham </span>
-                <b className="font-semibold">{title?.slice(0, 144)}</b>
-                <span> nomli mahsulotni o'chirmoqchimisiz?</span>
-              </>
-            }
-          >
-            <button className="btn-primary z-10 bg-red-500 h-9 font-normal hover:bg-red-600">
-              O'chirish
-            </button>
-          </DeleteAlertDialog>
         </div>
       </div>
     </li>
