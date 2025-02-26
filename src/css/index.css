@@ -98,6 +98,10 @@
   table td {
     @apply text-center;
   }
+
+  .order-alert-dialog-textarea textarea {
+    @apply !h-24 !min-h-0 resize-none bg-gray-light;
+  }
 }
 
 /* --- Utilities --- */

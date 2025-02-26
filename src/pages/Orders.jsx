@@ -30,7 +30,6 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGettingOrder, setIsGettingOrder] = useState(false);
   const allOrders = useSelector((state) => state.orders.data);
-  const [filteredOrders, setFilteredOrders] = useState(allOrders || []);
 
   const loadOrders = () => {
     setHasError(false);
@@ -39,7 +38,6 @@ const Orders = () => {
     ordersService
       .getOrders()
       .then((products) => {
-        setFilteredOrders(products);
         dispatch(updateOrders(products));
       })
       .catch(() => setHasError(true))
@@ -53,7 +51,6 @@ const Orders = () => {
     ordersService
       .addOrderToOperator({ address })
       .then(({ signed_order: order }) => {
-        setFilteredOrders([order, ...allOrders]);
         dispatch(updateOrders([order, ...allOrders]));
       })
       .catch(({ response }) => {
@@ -102,9 +99,9 @@ const Orders = () => {
       </div>
 
       {/* Orders */}
-      {!isLoading && !hasError && filteredOrders?.length >= 0 && (
+      {!isLoading && !hasError && allOrders?.length >= 0 && (
         <div className="overflow-hidden rounded-xl">
-          <OrdersTable orders={filteredOrders} />
+          <OrdersTable orders={allOrders} />
         </div>
       )}
 
