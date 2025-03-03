@@ -5,9 +5,9 @@ import api from "../axiosConfig";
 import endpoints from "../apiEndpoints";
 
 const ordersService = {
-  getOrders: async () => {
+  getOrders: async (isOperator = false) => {
     try {
-      return await api.get(endpoints.getOrders);
+      return await api.get(endpoints.getOrders(isOperator));
     } catch (err) {
       throw err;
     }
@@ -21,17 +21,9 @@ const ordersService = {
     }
   },
 
-  checkOrder: async (id, data) => {
+  updateOrderStatus: async (id, status, data) => {
     try {
-      return await api.put(endpoints.checkOrder(id), data);
-    } catch (err) {
-      throw err;
-    }
-  },
-
-  cancelOrder: async (id) => {
-    try {
-      return await api.put(endpoints.cancelOrder(id));
+      return await api.put(endpoints.updateOrderStatus(id, status), data);
     } catch (err) {
       throw err;
     }
