@@ -16,15 +16,22 @@ import {
 // Components
 import FormInputWrapper from "./FormInputWrapper";
 import ordersService from "@/api/services/ordersService";
+
+// Notification
 import { notification } from "@/notification";
+
+// Redux
 import { useDispatch, useSelector } from "react-redux";
 import { updateOrders } from "@/store/features/ordersSlice";
 
 const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
   const dispatch = useDispatch();
-  const [status, setStatus] = useState("check");
   const [description, setDescription] = useState("");
   const orders = useSelector((state) => state.orders.data);
+  const { status: workerRole } = useSelector((state) => state.user.data);
+  const isCourier = workerRole === "courier";
+  const isOperator = workerRole === "operator";
+  const [status, setStatus] = useState(isOperator ? "check" : "success");
 
   const handleStatusChange = (e) => {
     const value = e.target.value;
@@ -42,30 +49,16 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
     if (!orderId) return notification.error("Buyurtma ID raqami noto'g'ri");
 
     // Check order
-    if (status === "check") {
-      notification.promise(
-        ordersService
-          .checkOrder(orderId, { full_address: description })
-          .then(deleteOrder),
-        {
-          success: "Buyurtma tekshirildi!",
-          loading: "Buyurtma tekshirilmoqda...",
-          error: "Buyurtmani tekshirishda xatolik!",
-        }
-      );
-    }
-
-    // Cancel order
-    else {
-      notification.promise(
-        ordersService.cancelOrder(orderId).then(deleteOrder),
-        {
-          success: "Buyurtma bekor qilindi!",
-          loading: "Buyurtma bekor qilinmoqda...",
-          error: "Buyurtmani bekor qilishda xatolik!",
-        }
-      );
-    }
+    notification.promise(
+      ordersService
+        .updateOrderStatus(orderId, status, { full_address: description })
+        .then(deleteOrder),
+      {
+        loading: "Buyurtma holati o'zgartirilmoqda...",
+        error: "Buyurtma holatini o'zgartirishda xatolik!",
+        success: `Buyurtma holati ${status}ga o'zgartirildi!`,
+      }
+    );
   };
 
   return (
@@ -103,6 +96,7 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
             </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         {/* Body */}
         <div className="group flex flex-col items-center justify-center gap-2 relative overflow-hidden w-full rounded-b-lg">
           {/* Label */}
@@ -120,11 +114,23 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
             onChange={handleStatusChange}
             className="h-11 px-3 bg-gray-light"
           >
-            <option value="check">Tekshirilgan</option>
-            <option value="cancel">Bekor qilingan</option>
+            {isOperator && (
+              <>
+                <option value="check">Tekshirilgan</option>
+                <option value="cancel">Bekor qilingan</option>
+              </>
+            )}
+
+            {isCourier && (
+              <>
+                <option value="success">Yetkazilgan</option>
+                <option value="return">Qaytarilgan</option>
+              </>
+            )}
           </select>
         </div>
-        {status === "check" && (
+
+        {status === "check" && isOperator && (
           <FormInputWrapper
             as="textarea"
             label="Ba'tafsil ma'lumot *"
@@ -133,6 +139,7 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
             className="order-alert-dialog-textarea textarea"
           />
         )}
+
         {/* Footer */}
         <AlertDialogFooter>
           <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
