@@ -1,5 +1,8 @@
 import React from "react";
 
+// Redux
+import { useSelector } from "react-redux";
+
 // Data
 import addresses from "@/data/addresses";
 import orderStatuses from "@/data/orderStatuses";
@@ -8,6 +11,7 @@ import orderStatuses from "@/data/orderStatuses";
 import Icon from "./Icon";
 import StickyCell from "./StickyCell";
 import TruncatedCell from "./TruncatedCell";
+import { OrderDetailDrawer } from "./OrderDetailDrawer";
 import OrderActionAlertDialog from "./OrderActionAlertDialog";
 
 // Images
@@ -17,7 +21,6 @@ import reloadIcon from "../assets/images/icons/double-reload.svg";
 import { extractNumbers, formatDate, getPercentageBgColor } from "@/utils";
 
 const OrderItem = ({ data = {}, index = 0, isScrolled }) => {
-  let level = 0;
   const {
     status,
     _id: orderId,
@@ -26,10 +29,16 @@ const OrderItem = ({ data = {}, index = 0, isScrolled }) => {
     product_id: product,
     created_at: timestamp,
     client_name: firstName,
+    order_code: orderNumber,
     client_address: address,
   } = data || {};
 
-  const { _id: productId } = product || {};
+  const { status: workerRole } = useSelector((state) => state.user.data);
+  const isCourier = workerRole === "courier";
+  const isOperator = workerRole === "operator";
+
+  const formattedProductId =
+    typeof product === "string" ? product : product?._id;
 
   const formattedAddress =
     addresses.find(({ value }) => value == address)?.label ||
@@ -43,24 +52,31 @@ const OrderItem = ({ data = {}, index = 0, isScrolled }) => {
     orderStatuses.find(({ value }) => value == status)?.color || "black";
 
   // Update level
-  const addressNumber = Number(address) || -1;
-  const firstNameLength = firstName?.length || 0;
-  const telLength = extractNumbers(tel)?.length || 0;
+  const getLevel = () => {
+    let level = 0;
 
-  if (telLength === 12 || telLength === 9) level += 20;
-  if (addressNumber > 0 && addressNumber < 15) level += 20;
-  if (telLength === 12 && firstNameLength > 4) level += 10;
-  if (firstNameLength > 3 && firstNameLength < 24) level += 20;
-  if (
-    telLength === 12 &&
-    firstNameLength > 4 &&
-    firstNameLength < 18 &&
-    addressNumber > 0 &&
-    addressNumber < 15
-  ) {
-    level += 20;
-  }
-  if (telLength < 8 || !telLength) level = 0;
+    const addressNumber = Number(address) || -1;
+    const firstNameLength = firstName?.length || 0;
+    const telLength = extractNumbers(tel)?.length || 0;
+
+    if (telLength === 12 || telLength === 9) level += 20;
+    if (addressNumber > 0 && addressNumber < 15) level += 20;
+    if (telLength === 12 && firstNameLength > 4) level += 10;
+    if (firstNameLength > 3 && firstNameLength < 24) level += 20;
+    if (
+      telLength === 12 &&
+      firstNameLength > 4 &&
+      firstNameLength < 18 &&
+      addressNumber > 0 &&
+      addressNumber < 15
+    ) {
+      level += 20;
+    }
+    if (telLength < 8 || !telLength) level = 0;
+    return level;
+  };
+
+  const level = getLevel();
 
   return (
     <tr className="group h-12 bg-neutral-50 even:bg-white">
@@ -70,9 +86,17 @@ const OrderItem = ({ data = {}, index = 0, isScrolled }) => {
       {/* User */}
       <TruncatedCell trunc="2">{firstName}</TruncatedCell>
 
+      {/* Order Number */}
+      {isCourier && (
+        <OrderDetailDrawer data={data}>
+          <td className="cursor-pointer">{orderNumber}</td>
+        </OrderDetailDrawer>
+      )}
+
       {/* Address */}
       <td>
         <address>{formattedAddress}</address>
+        <OrderDetailDrawer />
       </td>
 
       {/* Phone */}
@@ -90,9 +114,9 @@ const OrderItem = ({ data = {}, index = 0, isScrolled }) => {
         <a
           target="_blank"
           className="primary-link"
-          href={`https://menemarket.netlify.app/products/product/${productId}`}
+          href={`https://menemarket.netlify.app/products/product/${formattedProductId}`}
         >
-          {productId}
+          {formattedProductId}
         </a>
       </TruncatedCell>
 
@@ -103,15 +127,17 @@ const OrderItem = ({ data = {}, index = 0, isScrolled }) => {
       <td>{formatDate(timestamp)}</td>
 
       {/* Level */}
-      <td>
-        <div
-          className={`${getPercentageBgColor(
-            level
-          )} flex items-center justify-center w-11 h-6 m-auto rounded-full text-white text-sm`}
-        >
-          {level}%
-        </div>
-      </td>
+      {isOperator && (
+        <td>
+          <div
+            className={`${getPercentageBgColor(
+              level
+            )} flex items-center justify-center w-11 h-6 m-auto rounded-full text-white text-sm`}
+          >
+            {level}%
+          </div>
+        </td>
+      )}
 
       {/* Action */}
       <td>
