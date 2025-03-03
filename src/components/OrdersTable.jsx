@@ -3,9 +3,16 @@ import React, { useState } from "react";
 // Components
 import OrderItem from "./OrderItem";
 
+// Redux
+import { useSelector } from "react-redux";
+
 const OrdersTable = ({ orders }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const handleScroll = (e) => setIsScrolled(e.target.scrollLeft > 1);
+  const { status: workerRole } = useSelector((state) => state.user.data);
+
+  const isCourier = workerRole === "courier";
+  const isOperator = workerRole === "operator";
 
   return (
     <div
@@ -24,13 +31,14 @@ const OrdersTable = ({ orders }) => {
               No
             </th>
             <th className="font-semibold">Foydalanuvchi</th>
+            {isCourier && <th className="font-semibold">Buyurtma raqami</th>}
             <th className="font-semibold">Manzil</th>
             <th className="w-48 font-semibold">Tel raqam</th>
             <th className="w-44 font-semibold">Holati</th>
             <th className="font-semibold">Mahsulot ID</th>
             <th className="font-semibold">Mahsulot narxi</th>
             <th className="w-40 font-semibold">Sana</th>
-            <th className="w-28 font-semibold">Darajasi</th>
+            {isOperator && <th className="w-28 font-semibold">Darajasi</th>}
             <th className="w-28 font-semibold">Harakat</th>
           </tr>
         </thead>

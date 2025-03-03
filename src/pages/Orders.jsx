@@ -30,15 +30,16 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGettingOrder, setIsGettingOrder] = useState(false);
   const allOrders = useSelector((state) => state.orders.data);
+  const { status: workerRole } = useSelector((state) => state.user.data);
 
   const loadOrders = () => {
     setHasError(false);
     setIsLoading(true);
 
     ordersService
-      .getOrders()
-      .then((products) => {
-        dispatch(updateOrders(products));
+      .getOrders(workerRole === "operator")
+      .then((orders) => {
+        dispatch(updateOrders(orders));
       })
       .catch(() => setHasError(true))
       .finally(() => setIsLoading(false));
@@ -74,28 +75,30 @@ const Orders = () => {
         <Tabs name="orders" />
 
         {/* Get new order */}
-        <div className="flex flex-col gap-5 w-full xs:w-auto xs:flex-row">
-          <select
-            name="Addresses"
-            disabled={isGettingOrder}
-            className="h-11 px-3.5 rounded-xl xs:h-12"
-            onChange={(e) => setAddress(e.target.value)}
-          >
-            {addresses.map(({ label, value }) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+        {workerRole === "operator" && (
+          <div className="flex flex-col gap-5 w-full xs:w-auto xs:flex-row">
+            <select
+              name="Addresses"
+              disabled={isGettingOrder}
+              className="h-11 px-3.5 rounded-xl xs:h-12"
+              onChange={(e) => setAddress(e.target.value)}
+            >
+              {addresses.map(({ label, value }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
 
-          <button
-            onClick={handleGetOrder}
-            disabled={isGettingOrder}
-            className="btn-primary w-full h-11 rounded-xl xs:h-12 xs:w-60"
-          >
-            <LoadingText text="Buyurtma olish" loader={isGettingOrder} />
-          </button>
-        </div>
+            <button
+              onClick={handleGetOrder}
+              disabled={isGettingOrder}
+              className="btn-primary w-full h-11 rounded-xl xs:h-12 xs:w-60"
+            >
+              <LoadingText text="Buyurtma olish" loader={isGettingOrder} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Orders */}
