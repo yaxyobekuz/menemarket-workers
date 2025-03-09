@@ -35,9 +35,7 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
 
   const handleStatusChange = (e) => {
     const value = e.target.value;
-
     setStatus(value);
-    if (value !== "check") setDescription("");
   };
 
   const deleteOrder = () => {
@@ -47,11 +45,25 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
 
   const handleFetchApi = () => {
     if (!orderId) return notification.error("Buyurtma ID raqami noto'g'ri");
+    if (
+      description?.length &&
+      status !== "success" &&
+      description?.length < 10
+    ) {
+      return notification.error(
+        "Izoh uzunligi 10 ta harflardan ortiq  bo'lishi kerak"
+      );
+    }
+
+    const formData = {};
+
+    if (status === "check") formData.full_address = description;
+    else formData.desc = description;
 
     // Check order
     notification.promise(
       ordersService
-        .updateOrderStatus(orderId, status, { full_address: description })
+        .updateOrderStatus(orderId, status, formData)
         .then(deleteOrder),
       {
         loading: "Buyurtma holati o'zgartirilmoqda...",
@@ -130,7 +142,7 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
           </select>
         </div>
 
-        {status === "check" && isOperator && (
+        {status !== "success" && (
           <FormInputWrapper
             as="textarea"
             label="Ba'tafsil ma'lumot *"
@@ -140,13 +152,15 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
           />
         )}
 
+        {console.log(description.length)}
+
         {/* Footer */}
         <AlertDialogFooter>
           <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleFetchApi}
             className="btn-primary hover:bg-primary-default/80"
-            disabled={status === "check" && description?.length < 10}
+            disabled={status !== "success" && description?.length < 10}
           >
             O'zgartirish
           </AlertDialogAction>
