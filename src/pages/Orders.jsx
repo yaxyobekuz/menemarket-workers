@@ -21,7 +21,7 @@ import reloadIcon from "@/assets/images/icons/reload.svg";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
-import { updateOrders } from "@/store/features/ordersSlice";
+import { addOrder, updateOrders } from "@/store/features/ordersSlice";
 
 const Orders = () => {
   const dispatch = useDispatch();
@@ -39,7 +39,11 @@ const Orders = () => {
     ordersService
       .getOrders(workerRole === "operator")
       .then((orders) => {
-        dispatch(updateOrders(orders));
+        if (orders?.length) {
+          dispatch(updateOrders(orders));
+        } else {
+          notification("Buyurtmalar mavjud emas", "☹️");
+        }
       })
       .catch(() => setHasError(true))
       .finally(() => setIsLoading(false));
@@ -51,11 +55,9 @@ const Orders = () => {
 
     ordersService
       .addOrderToOperator({ address })
-      .then(({ signed_order: order }) => {
-        dispatch(updateOrders([order, ...allOrders]));
-      })
+      .then(({ signed_order: order }) => dispatch(addOrder(order)))
       .catch(({ response }) => {
-        const { message } = response?.data;
+        const { message } = response?.data || {};
         notification.error(message || "Oqim olishda xatolik");
       })
       .finally(() => setIsGettingOrder(false));
