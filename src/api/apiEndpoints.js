@@ -18,7 +18,7 @@ const apiEndpoints = {
   createOrder: (id) => `api/orders/${id}`,
   addOrderToOperator: "api/orders/sign_order_to_operator",
   updateOrderStatus: (id, status) => `api/orders/${id}/${status}`,
-  getOrders: (isOperator) => "api/orders/" + (isOperator ? "operator" : ""),
+  getOrders: (isOperator) => "api/orders/" + (isOperator ? "operator/uo" : ""),
 };
 
 export default apiEndpoints;
