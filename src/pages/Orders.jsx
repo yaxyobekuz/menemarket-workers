@@ -30,6 +30,7 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGettingOrder, setIsGettingOrder] = useState(false);
   const allOrders = useSelector((state) => state.orders.data);
+  const [filteredOrders, setFilteredOrders] = useState(allOrders || []);
   const { status: workerRole } = useSelector((state) => state.user.data);
 
   const loadOrders = () => {
@@ -40,6 +41,7 @@ const Orders = () => {
       .getOrders(workerRole === "operator")
       .then((orders) => {
         if (orders?.length) {
+          setFilteredOrders(orders);
           dispatch(updateOrders(orders));
         } else {
           notification("Buyurtmalar mavjud emas", "☹️");
@@ -63,6 +65,14 @@ const Orders = () => {
       .finally(() => setIsGettingOrder(false));
   };
 
+  const handleFilterOrder = (e) => {
+    if (isLoading || !allOrders?.length) return;
+    const id = e.target.value?.trim();
+    if (!id) return setFilteredOrders(allOrders);
+    const filteredOrders = allOrders.filter((order) => order._d?.includes(id));
+    setFilteredOrders(filteredOrders);
+  };
+
   useEffect(() => {
     if (allOrders?.length === 0) loadOrders();
     else setTimeout(() => setIsLoading(false), 300);
@@ -77,7 +87,7 @@ const Orders = () => {
         <Tabs name="orders" />
 
         {/* Get new order */}
-        {workerRole === "operator" && (
+        {workerRole === "operator" ? (
           <div className="flex flex-col gap-5 w-full xs:w-auto xs:flex-row">
             <select
               name="Addresses"
@@ -100,13 +110,20 @@ const Orders = () => {
               <LoadingText text="Buyurtma olish" loader={isGettingOrder} />
             </button>
           </div>
+        ) : (
+          <input
+            type="text"
+            placeholder="Qidirish"
+            onChange={handleFilterOrder}
+            className="max-w-xl h-11 px-3.5 rounded-xl xs:h-12"
+          />
         )}
       </div>
 
       {/* Orders */}
       {!isLoading && !hasError && allOrders?.length >= 0 && (
         <div className="overflow-hidden rounded-xl">
-          <OrdersTable orders={allOrders} />
+          <OrdersTable orders={filteredOrders} />
         </div>
       )}
 
