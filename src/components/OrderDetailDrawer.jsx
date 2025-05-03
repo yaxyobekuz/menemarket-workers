@@ -31,8 +31,6 @@ import { extractNumbers, formatDate } from "@/utils";
 
 export function OrderDetailDrawer({ children, data = {} }) {
   const {
-    status,
-    total_price: price,
     client_mobile: tel,
     product_id: product,
     created_at: timestamp,
@@ -42,6 +40,7 @@ export function OrderDetailDrawer({ children, data = {} }) {
     full_address: fullAddress,
   } = data || {};
   const [open, setOpen] = useState(false);
+  const price = product?.price + 30000 || "0";
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const formattedAddress =
