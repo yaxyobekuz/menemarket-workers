@@ -69,7 +69,9 @@ const Orders = () => {
     if (isLoading || !allOrders?.length) return;
     const id = e.target.value?.trim();
     if (!id) return setFilteredOrders(allOrders);
-    const filteredOrders = allOrders.filter((order) => order._d?.includes(id));
+    const filteredOrders = allOrders.filter((order) =>
+      String(order?.order_code)?.includes(id)
+    );
     setFilteredOrders(filteredOrders);
   };
 

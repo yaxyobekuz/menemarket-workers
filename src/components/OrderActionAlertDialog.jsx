@@ -152,8 +152,6 @@ const OrderActionAlertDialog = ({ children, clientName = "", orderId }) => {
           />
         )}
 
-        {console.log(description.length)}
-
         {/* Footer */}
         <AlertDialogFooter>
           <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
