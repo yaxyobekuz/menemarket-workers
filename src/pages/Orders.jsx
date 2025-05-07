@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 
+// Utils
+import { extractNumbers } from "@/utils";
+
 // Data
 import addresses from "@/data/addresses";
 
@@ -69,8 +72,10 @@ const Orders = () => {
     if (isLoading || !allOrders?.length) return;
     const id = e.target.value?.trim();
     if (!id) return setFilteredOrders(allOrders);
-    const filteredOrders = allOrders.filter((order) =>
-      String(order?.order_code)?.includes(id)
+    const filteredOrders = allOrders.filter(
+      (order) =>
+        String(order?.order_code)?.includes(id) ||
+        String(extractNumbers(order?.client_mobile))?.includes(id)
     );
     setFilteredOrders(filteredOrders);
   };
